@@ -13,23 +13,27 @@ app = FastAPI(
 )
 
 # React frontend connection
-# React frontend connection
 frontend_url = os.getenv("FRONTEND_URL", "")
 
 allowed_origins = [
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+    "https://ai-resume-analyzer-frontend-lake-sigma.vercel.app",
+    "https://ai-resume-analyzer-sable-two.vercel.app",
 ]
 
 if frontend_url:
-    allowed_origins.extend(
-        origin.strip()
-        for origin in frontend_url.split(",")
-        if origin.strip()
-    )
+    for origin in frontend_url.split(","):
+        origin = origin.strip().rstrip("/")
+        if origin and origin not in allowed_origins:
+            allowed_origins.append(origin)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,6 +41,7 @@ app.add_middleware(
 
 
 @app.get("/")
+@app.get("/api")
 def home():
     return {
         "message": "AI Resume Analyzer Backend is running!"
@@ -44,10 +49,12 @@ def home():
 
 
 @app.get("/health")
+@app.get("/api/health")
 def health_check():
     return {"status": "healthy"}
 
 
+@app.get("/test")
 @app.get("/api/test")
 def test_connection():
     return {
@@ -55,6 +62,7 @@ def test_connection():
     }
 
 
+@app.post("/upload")
 @app.post("/api/upload")
 async def upload_resume(file: UploadFile = File(...)):
 

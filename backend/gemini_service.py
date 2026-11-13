@@ -9,18 +9,20 @@ from google import genai
 # Load environment variables from .env
 load_dotenv()
 
-# Get Gemini API key
-API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not API_KEY:
-    raise ValueError("GEMINI_API_KEY is missing from .env file")
+def get_gemini_client():
+    # Get Gemini API key
+    api_key = os.getenv("GEMINI_API_KEY")
 
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY is missing. Please set it in your environment or Vercel project settings.")
 
-# Initialize Gemini client
-client = genai.Client(api_key=API_KEY)
+    # Initialize Gemini client
+    return genai.Client(api_key=api_key)
 
 
 def analyze_resume(resume_text: str):
+    client = get_gemini_client()
 
     prompt = f"""
     You are an expert professional resume analyzer.

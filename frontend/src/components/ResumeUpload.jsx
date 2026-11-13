@@ -44,7 +44,8 @@ function ResumeUpload() {
       setAnalysis(null);
       setMessage("Analyzing your resume with AI...");
 
-      const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+      const rawApiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+      const API_URL = rawApiUrl.replace(/\/+$/, "");
 
       const response = await fetch(
         `${API_URL}/api/upload`,
@@ -54,7 +55,12 @@ function ResumeUpload() {
         }
       );
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseErr) {
+        throw new Error(`Server returned status ${response.status} (${response.statusText || "Error"})`);
+      }
 
       if (!response.ok) {
         throw new Error(data.detail || "Upload failed.");
