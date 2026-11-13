@@ -44,8 +44,10 @@ function ResumeUpload() {
       setAnalysis(null);
       setMessage("Analyzing your resume with AI...");
 
+      const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
       const response = await fetch(
-        "http://127.0.0.1:8000/api/upload",
+        `${API_URL}/api/upload`,
         {
           method: "POST",
           body: formData,

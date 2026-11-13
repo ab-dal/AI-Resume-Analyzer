@@ -1,6 +1,7 @@
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 from resume_parser import extract_text_from_pdf
 from gemini_service import analyze_resume
@@ -12,9 +13,23 @@ app = FastAPI(
 )
 
 # React frontend connection
+# React frontend connection
+frontend_url = os.getenv("FRONTEND_URL", "")
+
+allowed_origins = [
+    "http://localhost:5173"
+]
+
+if frontend_url:
+    allowed_origins.extend(
+        origin.strip()
+        for origin in frontend_url.split(",")
+        if origin.strip()
+    )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
